@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './styles/ProductManagment.css';  // Custom CSS file for styling
+import './styles/ProductManagment.css'; // Corrected typo
 
 const ProductPicker = ({ onSelectProduct, onClose }) => {
   const [search, setSearch] = useState('');
@@ -12,7 +12,6 @@ const ProductPicker = ({ onSelectProduct, onClose }) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  // Fetch products based on search and pagination
   useEffect(() => {
     const fetchProducts = async () => {
       if (search.trim() === '') return;
@@ -50,19 +49,16 @@ const ProductPicker = ({ onSelectProduct, onClose }) => {
     fetchProducts();
   }, [search, page]);
 
-  // Handle product search
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
     setProducts([]);
     setPage(1);
   };
 
-  // Load more products for pagination
   const handleLoadMore = () => {
     setPage(prevPage => prevPage + 1);
   };
 
-  // Handle variant selection
   const handleVariantSelect = (variantId) => {
     setSelectedVariants(prevSelected =>
       prevSelected.includes(variantId)
@@ -73,13 +69,11 @@ const ProductPicker = ({ onSelectProduct, onClose }) => {
 
   const isVariantSelected = (variantId) => selectedVariants.includes(variantId);
 
-  // Handle product click to select a product
   const handleProductClick = (product) => {
     setSelectedProduct(product);
-    setSelectedVariants([]);  // Reset variants for the selected product
+    setSelectedVariants([]);
   };
 
-  // Add the selected product and its variants
   const handleAddProduct = () => {
     if (selectedProduct && selectedVariants.length > 0) {
       const selectedProductData = {
@@ -87,13 +81,11 @@ const ProductPicker = ({ onSelectProduct, onClose }) => {
         variants: selectedVariants.map(variantId => selectedProduct.variants.find(variant => variant.id === variantId)),
       };
 
-      // Pass the selected product and variants back to parent component
       onSelectProduct(selectedProduct, selectedProductData.variants);
 
-      // Clear selection after adding
       setSelectedProduct(null);
       setSelectedVariants([]);
-      setSearch('');  // Reset search
+      setSearch('');
     }
   };
 
@@ -114,22 +106,23 @@ const ProductPicker = ({ onSelectProduct, onClose }) => {
         {products && products.length > 0 ? (
           products.map((product) => (
             <li key={product.id}>
-              <div onClick={() => handleProductClick(product)}>
-                <img src={product.image?.src} alt={product.title} width={50} />
-                <span>{product.title}</span>
+              <div className={`product-item ${selectedProduct && selectedProduct.id === product.id ? 'selected' : ''}`} onClick={() => handleProductClick(product)}>
+                <img src={product.image?.src} alt={product.title} className="product-image" />
+                <span className="product-title">{product.title}</span>
               </div>
 
               {selectedProduct && selectedProduct.id === product.id && product.variants && product.variants.length > 0 && (
                 <ul className="variant-list">
                   {product.variants.map(variant => (
-                    <li key={variant.id}>
-                      <label>
+                    <li key={variant.id} className="variant-item">
+                      <label className="variant-label">
                         <input
                           type="checkbox"
                           checked={isVariantSelected(variant.id)}
                           onChange={() => handleVariantSelect(variant.id)}
                         />
-                        {variant.title} - ${variant.price}
+                        <span className="variant-title">{variant.title}</span>
+                        <span className="variant-price">${variant.price}</span>
                       </label>
                     </li>
                   ))}
@@ -149,10 +142,10 @@ const ProductPicker = ({ onSelectProduct, onClose }) => {
       )}
 
       <div className="product-picker-actions">
-        <button onClick={handleAddProduct} disabled={!selectedProduct || selectedVariants.length === 0}>
+        <button onClick={handleAddProduct} disabled={!selectedProduct || selectedVariants.length === 0} className="add-product-btn">
           Add Product
         </button>
-        <button onClick={onClose}>Cancel</button>
+        <button onClick={onClose} className="cancel-btn">Cancel</button>
       </div>
     </div>
   );
